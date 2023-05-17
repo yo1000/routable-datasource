@@ -1,0 +1,14 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432,localhost:5433/my_database
+    username: my_user
+    password: my_password
+  sql:
+    init:
+      schema-locations: classpath*:/schema.sql
+      data-locations: classpath*:/data.sql
+      mode: always
