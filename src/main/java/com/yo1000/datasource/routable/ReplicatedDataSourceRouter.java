@@ -13,22 +13,25 @@ public class ReplicatedDataSourceRouter extends AbstractRoutingDataSource {
     private static final boolean TRANSACTION_READ_ONLY = true;
     private static final boolean TRANSACTION_READ_WRITE = false;
 
-    public ReplicatedDataSourceRouter(DataSourceProperties props) {
-        String url = props.getUrl();
+    public ReplicatedDataSourceRouter(
+            DataSourceProperties dataSourceProps,
+            RoutableDataSourceConfig.DataSourceRoutingProperties routingProps
+    ) {
+        String url = dataSourceProps.getUrl();
 
         String connSchema = url
-                .substring(0, url.length() - url.replaceFirst("^jdbc:[^:]+:/*", "").length());
+                .substring(0, url.length() - url.replaceFirst(routingProps.getPattern().getSchema(), "").length());
 
         String connHosts = url
                 .substring(connSchema.length())
-                .replaceFirst("[/?].*$", "");
+                .replaceFirst(routingProps.getPattern().getDatabaseOptions(), "");
 
         String connOptions = url
                 .substring(connSchema.length() + connHosts.length());
 
         String[] hosts = connHosts.split("\\s*,\\s*");
 
-        DataSource writerDataSource = props.initializeDataSourceBuilder().build();
+        DataSource writerDataSource = dataSourceProps.initializeDataSourceBuilder().build();
 
         if (hosts.length == 1) {
             setTargetDataSources(Map.ofEntries(
@@ -41,7 +44,7 @@ public class ReplicatedDataSourceRouter extends AbstractRoutingDataSource {
                     .collect(Collectors.joining(","))
                     + "," + hosts[0];
 
-            DataSource readerDataSource = props.initializeDataSourceBuilder()
+            DataSource readerDataSource = dataSourceProps.initializeDataSourceBuilder()
                     .url(connSchema + readerHosts + connOptions).build();
 
             setTargetDataSources(Map.ofEntries(

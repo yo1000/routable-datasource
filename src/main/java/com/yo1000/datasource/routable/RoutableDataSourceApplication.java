@@ -21,10 +21,10 @@ public class RoutableDataSourceApplication {
 
 	@RestController
 	@RequestMapping("/")
-	public static class PgreplRestController {
+	public static class UuidRestController {
 		private final NamedParameterJdbcOperations jdbcOps;
 
-		public PgreplRestController(NamedParameterJdbcOperations jdbcOps) {
+		public UuidRestController(NamedParameterJdbcOperations jdbcOps) {
 			this.jdbcOps = jdbcOps;
 		}
 
